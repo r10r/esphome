@@ -223,6 +223,59 @@ sensor:
     id: adc128s102_channel_0
     channel: 0
 
+  - platform: ade7880
+    irq0_pin:
+      number: GPIO13
+    irq1_pin:
+      number: GPIO5
+    reset_pin:
+      number: GPIO16
+    frequency: 60Hz
+    phase_a:
+      name: Channel A
+      voltage: Voltage
+      current: Current
+      active_power: Active Power
+      power_factor: Power Factor
+      forward_active_energy: Forward Active Energy
+      reverse_active_energy: Reverse Active Energy
+      calibration:
+        current: 3116628
+        voltage: -757178
+        power: -1344457
+        phase_angle: 188
+    phase_b:
+      name: Channel B
+      voltage: Voltage
+      current: Current
+      active_power: Active Power
+      power_factor: Power Factor
+      forward_active_energy: Forward Active Energy
+      reverse_active_energy: Reverse Active Energy
+      calibration:
+        current: 3133655
+        voltage: -755235
+        power: -1345638
+        phase_angle: 188
+    phase_c:
+      name: Channel C
+      voltage: Voltage
+      current: Current
+      active_power: Active Power
+      power_factor: Power Factor
+      forward_active_energy: Forward Active Energy
+      reverse_active_energy: Reverse Active Energy
+      calibration:
+        current: 3111158
+        voltage: -743813
+        power: -1351437
+        phase_angle: 180
+    neutral:
+      name: Neutral
+      current: Current
+      calibration:
+        current: 3189
+
 apds9960:
   address: 0x20
   update_interval: 60s
