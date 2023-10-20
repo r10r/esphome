@@ -16,6 +16,20 @@
 
 #include "ade7880_registers.h"
 
+// See also Table 51. LCYCMODE Register, ADE7880 Datasheet, Rev. C | Page 104 of 107
+constexpr uint16_t LWATT = 1<<0;
+// enable line cycle reactive energy accumulation mode
+constexpr uint16_t LVAR= 1<<1;
+// enable the line cycle energy accumulation mode
+constexpr uint16_t LVA = 1<<2;
+// read with reset of watt-hour registers is enabled
+constexpr uint16_t RSTREAD = 1<<6;
+// power factor calculation uses phase energies values calculated using line cycle accumulation mode
+// See also ADE7880 manual "Power Factor Calculation" (Rev.C|Page 58 of 107)
+constexpr uint16_t PFMODE = 1<<7;
+
+constexpr uint16_t PFMODE_BITS = LWATT | LVA | PFMODE;
+
 namespace esphome {
 namespace ade7880 {
 
