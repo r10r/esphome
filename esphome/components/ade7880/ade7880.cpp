@@ -96,6 +96,11 @@ void ADE7880::update_sensor_from_s32_register16_(sensor::Sensor *sensor, uint16_
   sensor->publish_state(f(val));
 }
 
+// maximum APF|BPF|CPF register value is 0x7FFF (1)
+// minimum * register value is 0x8000 (-1)
+
+// # - 32767 => + 32767
+
 void ADE7880::update() {
   if (this->store_.reset_pending) {
     return;
@@ -241,6 +246,7 @@ void ADE7880::calibrate_s24zpse_reading_(uint16_t a_register, int32_t calibratio
   this->write_s24zpse_register16_(a_register, calibration);
 }
 
+// See initialization ADE 7880 Data Sheet, Rev. C | Page 40 of 107
 void ADE7880::init_device_() {
   this->write_u8_register16_(CONFIG2, CONFIG2_I2C_LOCK);
 
@@ -267,6 +273,8 @@ void ADE7880::init_device_() {
     this->calibrate_s24zpse_reading_(BPGAIN, this->channel_b_->power_calibration);
     this->calibrate_s10zp_reading_(BPHCAL, this->channel_b_->phase_angle_calibration);
   }
+
+  this->write_u16_register16_(LCYCMODE, PFMODE_BITS);
 
   if (this->channel_c_ != nullptr) {
     this->calibrate_s24zpse_reading_(CIGAIN, this->channel_c_->current_calibration);
