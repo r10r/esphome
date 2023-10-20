@@ -139,11 +139,10 @@ POWER_CHANNEL_SCHEMA = cv.Schema(
         ),
         cv.Required(CONF_CALIBRATION): cv.Schema(
             {
-                cv.Required(CONF_CURRENT): cv.int_range(min=-8388608, max=8388607),
                 cv.Required(CONF_VOLTAGE): cv.int_range(min=-8388608, max=8388607),
-                cv.Required(CONF_POWER): cv.int_range(min=-8388608, max=8388607),
+                cv.Required(CONF_POWER): cv.int_range(min=-18388608, max=18388607),
                 cv.Required(CONF_PHASE_ANGLE): cv.Any(
-                    cv.int_range(min=0, max=383), cv.int_range(min=512, max=575)
+                    cv.int_range(min=-2000000, max=200000383), cv.int_range(min=512, max=575)
                 ),
             },
         ),
