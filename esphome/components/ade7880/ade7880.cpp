@@ -115,7 +115,7 @@ void ADE7880::update() {
     this->update_sensor_from_s24zp_register16_(chan->active_power, AWATT, [](float val) { return val / 100.0f; });
     this->update_sensor_from_s24zp_register16_(chan->apparent_power, AVA, [](float val) { return val / 100.0f; });
     this->update_sensor_from_s16_register16_(chan->power_factor, APF,
-                                             [](float val) { return std::abs(val / -327.68f); });
+                                             [](float val) { return val / 100.0f; });
     this->update_sensor_from_s32_register16_(chan->forward_active_energy, AFWATTHR, [&chan](float val) {
       return chan->forward_active_energy_total += val / 14400.0f;
     });
@@ -131,7 +131,7 @@ void ADE7880::update() {
     this->update_sensor_from_s24zp_register16_(chan->active_power, BWATT, [](float val) { return val / 100.0f; });
     this->update_sensor_from_s24zp_register16_(chan->apparent_power, BVA, [](float val) { return val / 100.0f; });
     this->update_sensor_from_s16_register16_(chan->power_factor, BPF,
-                                             [](float val) { return std::abs(val / -327.68f); });
+                                             [](float val) { return val / 100.0f; });
     this->update_sensor_from_s32_register16_(chan->forward_active_energy, BFWATTHR, [&chan](float val) {
       return chan->forward_active_energy_total += val / 14400.0f;
     });
@@ -147,7 +147,7 @@ void ADE7880::update() {
     this->update_sensor_from_s24zp_register16_(chan->active_power, CWATT, [](float val) { return val / 100.0f; });
     this->update_sensor_from_s24zp_register16_(chan->apparent_power, CVA, [](float val) { return val / 100.0f; });
     this->update_sensor_from_s16_register16_(chan->power_factor, CPF,
-                                             [](float val) { return std::abs(val / -327.68f); });
+                                             [](float val) { return val / 100.0f; });
     this->update_sensor_from_s32_register16_(chan->forward_active_energy, CFWATTHR, [&chan](float val) {
       return chan->forward_active_energy_total += val / 14400.0f;
     });
