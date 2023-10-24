@@ -17,6 +17,7 @@ namespace ade7880 {
 static const char *const TAG = "ade7880";
 
 void IRAM_ATTR ADE7880Store::gpio_intr(ADE7880Store *arg) { arg->reset_done = true; }
+void IRAM_ATTR ADE7880Store::gpio_intr(ADE7880Store *arg) { arg->reset_done = true; }
 
 void ADE7880::setup() {
   if (this->irq0_pin_ != nullptr) {
@@ -28,6 +29,68 @@ void ADE7880::setup() {
   }
   this->store_.irq1_pin = this->irq1_pin_->to_isr();
   this->irq1_pin_->attach_interrupt(ADE7880Store::gpio_intr, &this->store_, gpio::INTERRUPT_FALLING_EDGE);
+
+  /*
+See also ADE 7880 Data Sheet, "Sign of Active Power Calculation", Rev. C | Page 48 of 107
+
+Sign of Active Power Calculation
+
+The average active power is a signed calculation. If the phase
+difference between the current and voltage waveform is
+more than 90°, the average power becomes negative. Negative
+power indicates that energy is being injected back on the grid.
+The ADE7880 has sign detection circuitry for active power
+calculations. It can monitor the total active powers or the
+fundamental active powers. As described in the Active Energy
+Calculation section, the active energy accumulation is performed
+in two stages. Every time a sign change is detected in the energy
+accumulation at the end of the first stage, that is, after the energy
+accumulated into the internal accumulator reaches the WTHR
+register threshold, a dedicated interrupt is triggered. The sign of
+each phase active power can be read in the PHSIGN register.
+
+Bit 6 (REVAPSEL) in the ACCMODE register sets the type of
+active power being monitored. When REVAPSEL is 0, the
+default value, the total active power is monitored. When
+REVAPSEL is 1, the fundamental active power is monitored.
+Bits[8:6] (REVAPC, REVAPB, and REVAPA, respectively) in the
+STATUS0 register are set when a sign change occurs in the power
+selected by Bit 6 (REVAPSEL) in the ACCMODE register.
+Bits[2:0] (CWSIGN, BWSIGN, and AWSIGN, respectively) in
+the PHSIGN register are set simultaneously with the REVAPC,
+REVAPB, and REVAPA bits. They indicate the sign of the
+power. When they are 0, the corresponding power is positive.
+When they are 1, the corresponding power is negative.
+Bit REVAPx of STATUS0 and Bit xWSIGN in the PHSIGN
+register refer to the total active power of Phase x, the power type
+being selected by Bit 6 (REVAPSEL) in the ACCMODE register
+
+Interrupts attached to Bits[8:6] (REVAPC, REVAPB, and
+REVAPA, respectively) in the STATUS0 register can be enabled
+by setting Bits[8:6] in the MASK0 register. If enabled, the IRQ0
+pin is set low, and the status bit is set to 1 whenever a change of
+sign occurs. To find the phase that triggered the interrupt, the
+PHSIGN register is read immediately after reading the STATUS0
+register. Next, the status bit is cleared and the IRQ0 pin is returned
+to high by writing to the STATUS0 register with the corresponding
+bit set to 1
+
+...
+
+# Active Energy Calculation
+
+-> Setting Bit 6 (RSTREAD) of the LCYCMODE register enables a
+read-with-reset for all watt-hour accumulation registers, that is,
+the registers are reset to 0 after a read operation.
+
+*/
+
+  // TODO attach interrupt to detect sing changes in PHSIGN ?
+  // When the sign changes -> add value to store (either feed (back to grid) or deliver (from grid))
+  // Note reading the register actually resets the register ....
+  // attach interrupt ot irq0_pin
+  // PHSIGN
+  // this->irq0_pin_->attach_interrupt(ADE7880Store::gpio_intr, &this->store_, 
 
   // if IRQ1 is already asserted, the cause must be determined
   if (this->irq1_pin_->digital_read() == 0) {
@@ -121,6 +184,7 @@ void ADE7880::update() {
     this->update_sensor_from_s24zp_register16_(chan->apparent_power, AVA, [](float val) { return val / 100.0f; });
     this->update_sensor_from_s16_register16_(chan->power_factor, APF,
                                              [](float val) { return val / 100.0f; });
+
     this->update_sensor_from_s32_register16_(chan->forward_active_energy, AFWATTHR, [&chan](float val) {
       return chan->forward_active_energy_total += val / 14400.0f;
     });

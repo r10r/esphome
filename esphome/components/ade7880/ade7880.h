@@ -69,6 +69,7 @@ struct PowerChannel {
   uint16_t phase_angle_calibration{0};
   float forward_active_energy_total{0};
   float reverse_active_energy_total{0};
+
 };
 
 // Store data in a class that doesn't use multiple-inheritance (no vtables in flash!)
@@ -78,6 +79,7 @@ struct ADE7880Store {
   ISRInternalGPIOPin irq1_pin;
 
   static void gpio_intr(ADE7880Store *arg);
+  static void phsign_intr(ADE7880Store *arg);
 };
 
 class ADE7880 : public i2c::I2CDevice, public PollingComponent {
